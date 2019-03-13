@@ -1,0 +1,26 @@
+<div class="row">
+  <div class="col-12 text-right">
+    <h1>Administración de la Institución</h1>
+  </div>
+</div>
+<div class="row">
+  <div class="col-12">
+    <ngb-tabset>
+      <ngb-tab title="Perfil Institucional" id="tab1">
+        <ng-template ngbTabContent>
+          <app-institution-profile></app-institution-profile>
+        </ng-template>
+      </ngb-tab>
+      <ngb-tab title="Estructura" id="tab2">
+        <ng-template ngbTabContent>
+            <app-institution-internal-divition></app-institution-internal-divition>
+        </ng-template>
+      </ngb-tab>
+      <ngb-tab title="Publicadores" id="tab3">
+        <ng-template ngbTabContent>
+            <app-publishers></app-publishers>
+        </ng-template>
+      </ngb-tab>
+    </ngb-tabset>
+  </div>
+</div>

@@ -1,0 +1,303 @@
+<div class="row">
+  <div class="col-12">
+    <ngb-carousel>
+      <ng-template ngbSlide *ngFor="let slide of sliders">
+        <div class="{{ slide.style }}"></div>
+        <div class="carousel-caption">
+          <div class="row">
+            <div class="col-3 text-left">
+              <img
+                src="data:{{ slide.logo.institution_logo_file_type }};base64,{{
+                  slide.logo.institution_logo_file
+                }}"
+                style="max-height: 150px; max-width: 150px;"
+              />
+            </div>
+            <div class="col-9">
+              <h3>
+                <strong>{{ slide.institution.name }}</strong>
+              </h3>
+              <h5>Visitanos: {{ slide.institution.address }}</h5>
+              <p>Llámanos: {{ slide.institution.phone_number }}</p>
+              <a href="{{ slide.institution.web }}" style="color:white">
+                Visita nuestro sitio web</a
+              >
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </ngb-carousel>
+  </div>
+</div>
+<div class="row">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+          <h3 class="mt-3 mb-3">Filtrar Publicaciones</h3>    
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+          <div class="input-group mt-2 mb-3">
+              <div class="input-group-prepend">
+                <button
+                  type="button"
+                  class="input-group-text btn btn-primary"
+                  title="Ir a la Página"
+                  (click)="searchPublications()"
+                >
+                  <span class="fas fa-search"></span>
+                </button>
+              </div>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Contiene"
+                #searchFilter
+                [(ngModel)]="searchValue"
+              />
+            </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="form-group row">
+            <label for="institution_id" class="col-4 col-form-label">Institución</label>
+            <div class="col-8">
+                <select class="form-control" id="institution_id" name="institution_id" [(ngModel)]="selectedInstitucionId" (change)="filterChangeInstitution()">
+                  <option value="0" selected>Todas las Opciones</option>
+                  <option *ngFor="let institution of institutions" value={{institution.id}}>
+                      {{institution.name}}
+                  </option>
+                </select>
+            </div>
+          </div>
+          <div class="form-group row" *ngIf="selectedInstitucionId != 0">
+            <label for="institution_id" class="col-4 col-form-label">Departamento</label>
+            <div class="col-8">
+                <select class="form-control" id="institution_id" name="institution_id" [(ngModel)]="selectedInternalInstitucionDivitionId" (change)="filterChangeInternalInstitucionDivition()">
+                  <option value="0" selected>Seleccione un Departamento</option>
+                  <option *ngFor="let institutionInternalDivition of institution_internal_divitions_combo" value={{institutionInternalDivition.id}}>
+                      {{institutionInternalDivition.description}}
+                  </option>
+                </select>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-12">
+    <table class="table table-hover mt-2">
+      <thead>
+        <tr>
+          <th>Seleccionado</th>
+          <th>Fecha de Publicación</th>
+          <th>Tipo</th>
+          <th>Título</th>
+          <th>Institución</th>
+          <th>Departamento</th>
+          <th>Opciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let publication of publicationsToShow"
+          (click)="selectPublication(publication)"
+        >
+          <td class="text-right">
+            <span
+              *ngIf="publicationSelected === publication"
+              class="far fa-hand-point-right"
+            ></span>
+          </td>
+          <td>{{ publication.publication.published_date }}</td>
+          <td>{{ publication.publicationType.name }}</td>
+          <td>{{ publication.publication.title }}</td>
+          <td>{{ publication.publicationInstitution.name }}</td>
+          <td>
+            {{ publication.publicationInstitutionInternalDivition.description }}
+          </td>
+          <th>
+            <button
+              type="button"
+              title="Descargar"
+              class="btn btn-success"
+              (click)="downloadPublication(publication.publication.id)"
+            >
+              <i class="fas fa-download"></i>
+            </button>
+          </th>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="row">
+  <div class="col-12">
+    <div class="btn-toolbar" role="toolbar">
+      <div class="btn-group mr-2" role="group">
+        <button
+          type="button"
+          class="btn btn-light"
+          *ngIf="currentPage === 1"
+          title="Primera Página"
+          disabled
+        >
+          Primera
+        </button>
+        <button
+          type="button"
+          class="btn btn-light"
+          *ngIf="currentPage !== 1"
+          title="Primera Página"
+          (click)="goToPage(1, selectedInternalInstitucionDivitionId, searchValue)"
+        >
+          Primera
+        </button>
+        <button
+          type="button"
+          class="btn btn-light"
+          *ngIf="currentPage > 1"
+          title="Página Anterior"
+          (click)="goToPage(currentPage - 1, selectedInternalInstitucionDivitionId, searchValue)"
+        >
+          {{ currentPage - 1 }}
+        </button>
+        <button type="button" class="btn btn-primary" title="Página Actual">
+          {{ currentPage }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-light"
+          *ngIf="currentPage < lastPage"
+          title="Página Siguiente"
+          (click)="goToPage(currentPage + 1, selectedInternalInstitucionDivitionId, searchValue)"
+        >
+          {{ currentPage + 1 }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-light"
+          *ngIf="currentPage !== lastPage"
+          title="Última Página"
+          (click)="goToPage(lastPage, selectedInternalInstitucionDivitionId, searchValue)"
+        >
+          Última
+        </button>
+        <button
+          type="button"
+          class="btn btn-light"
+          *ngIf="currentPage === lastPage"
+          title="Última Página"
+          disabled
+        >
+          Última
+        </button>
+      </div>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <button
+            type="button"
+            class="input-group-text btn btn-success"
+            title="Ir a la Página"
+            (click)="goToPage(goToPageNumber.value, selectedInternalInstitucionDivitionId, searchValue)"
+          >
+            Ir a
+          </button>
+        </div>
+        <input
+          type="number"
+          min="{{ 1 }}"
+          max="{{ lastPage }}"
+          class="form-control"
+          placeholder="Ir a la Página"
+          #goToPageNumber
+        />
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row mt-5" *ngIf="hasSelected">
+  <div
+    class="col-12"
+    style="border: 1px #D3D3D3 solid; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);"
+  >
+    <div class="container">
+      <h1 class="col-12 text-center">
+        {{ publicationSelected.publication.title }}
+      </h1>
+      <h3 class="mt-3 mb-3">Autores</h3>
+      <div class="row">
+        <div
+          class="col-4"
+          *ngFor="
+            let author of publicationSelected.publication.authors_on_publication
+          "
+        >
+          <p class="col-12 text-center">
+            {{ author.name }} {{ author.last_name }}<br />{{ author.email
+            }}<br /><strong>{{ author.affiliation }}</strong>
+          </p>
+        </div>
+      </div>
+      <h3 class="mt-3 mb-3">Resumen</h3>
+      <p [innerHTML]="publicationSelected.publication.abstract"></p>
+      <p>
+        <strong><i>Palabras Clave</i></strong
+        ><br />{{ publicationSelected.publication.keywords }}
+      </p>
+    </div>
+  </div>
+  <div class="col-12 mt-2">
+    <h3>Comentarios</h3>
+    <div class="row">
+      <div class="container">
+        <div
+          class="col-12 mb-2 mt-2"
+          style="background-color: whitesmoke;"
+          *ngFor="let comment of comments"
+        >
+          <div class="col-12 text-left" style="padding-top: 10px;">
+            <strong
+              >{{ comment.author.name }} {{ comment.author.last_name }}</strong
+            >
+          </div>
+          <div class="col-12">
+            <div
+              class="col-12 mt-2 mb-2"
+              [innerHTML]="comment.comment.content"
+            ></div>
+          </div>
+          <div class="col-12 text-right" style="padding-bottom: 10px;">
+            <strong
+              ><i>{{ comment.comment.created_at }}</i></strong
+            >
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <h3 class="mt-5">Tu opinión nos interesa:</h3>
+            <ck-editor
+              class="col-12"
+              id="newComment"
+              name="newComment"
+              skin="moono-lisa"
+              [(ngModel)]="comment.content"
+            ></ck-editor>
+          </div>
+          <div class="col-12 text-right">
+            <button
+              type="button"
+              class="btn btn-primary"
+              (click)="sendNewComment()"
+            >
+              Publicar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

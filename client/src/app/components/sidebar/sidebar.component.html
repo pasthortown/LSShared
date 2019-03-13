@@ -1,0 +1,76 @@
+<nav class="sidebar" [ngClass]="{ sidebarPushRight: isActive, collapsed: collapsed }">
+   <div class="list-group">
+      <a [routerLink]="['/main']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+         <i class="fas fa-layer-group"></i>&nbsp; <span>Publicaciones</span>
+      </a>
+      <a *ngIf="isPublisher || isInstitute" [routerLink]="['/my-publications']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+         <i class="fas fa-book-open"></i>&nbsp; <span>Publicaciones de la Institución</span>
+      </a>
+      <a *ngIf="isInstitute" [routerLink]="['/institution-admin']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+         <i class="fas fa-school"></i>&nbsp; <span>Mi Institución</span>
+      </a>
+      <div *ngIf="isAdmin" class="nested-menu">
+         <a class="list-group-item" (click)="addExpandClass('bdd')">
+            <span class="fas fa-database"></span>&nbsp;Administrador MINTUR
+         </a>
+         <li class="nested" [class.expand]="showMenu === 'bdd'">
+            <ul class="submenu">
+               <li>
+                  <a [routerLink]="['/institution']" [routerLinkActive]="['router-link-active']" class="list-group-item">Instituciones </a>
+               </li>
+               <li>
+                  <a [routerLink]="['/person']" [routerLinkActive]="['router-link-active']" class="list-group-item">Personas</a>
+               </li>
+               <li>
+                  <a [routerLink]="['/institution_logo']" [routerLinkActive]="['router-link-active']" class="list-group-item">Logotipos</a>
+               </li>
+               <li>
+                  <a [routerLink]="['/author']" [routerLinkActive]="['router-link-active']" class="list-group-item">Autores</a>
+               </li>
+               <li>
+                  <a [routerLink]="['/publication_comment']" [routerLinkActive]="['router-link-active']" class="list-group-item">Comentarios</a>
+               </li>
+               <li>
+                  <a [routerLink]="['/publication_type']" [routerLinkActive]="['router-link-active']" class="list-group-item">Tipos de Publicación</a>
+               </li>
+               <li>
+                  <a [routerLink]="['/institution_internal_divition']" [routerLinkActive]="['router-link-active']" class="list-group-item">Estructuras de Institución</a>
+               </li>
+               <li>
+                  <a [routerLink]="['/institution_internal_rol']" [routerLinkActive]="['router-link-active']" class="list-group-item">Roles de Institución</a>
+               </li>
+               <li>
+                  <a [routerLink]="['/institution_internal_rol_assignment']" [routerLinkActive]="['router-link-active']" class="list-group-item">Asignación de Roles (Institución)</a>
+               </li>
+               <li>
+                  <a [routerLink]="['/account_rol']" [routerLinkActive]="['router-link-active']" class="list-group-item">Roles de Cuentas</a>
+               </li>
+               <li>
+                  <a [routerLink]="['/administrative_rol']" [routerLinkActive]="['router-link-active']" class="list-group-item">Roles Administrativos</a>
+               </li>
+               <li>
+                  <a [routerLink]="['/publication']" [routerLinkActive]="['router-link-active']" class="list-group-item">Publicaciones</a>
+               </li>
+               <li>
+                  <a [routerLink]="['/publication_attachment']" [routerLinkActive]="['router-link-active']" class="list-group-item">Adjuntos</a>
+               </li>
+            </ul>
+         </li>
+      </div>
+      <div class="nested-menu">
+         <a class="list-group-item" (click)="addExpandClass('profile')">
+            <span><img class="rounded-circle" src="{{profileImg}}" width="32px" height="32px"></span>&nbsp;<small *ngIf="refreshUser()">{{ user.name }}</small>
+         </a>
+         <li class="nested" [class.expand]="showMenu === 'profile'">
+            <ul class="submenu">
+               <li>
+                  <a [routerLink]="['/profile']" [routerLinkActive]="['router-link-active']" class="list-group-item">Perfil </a>
+               </li>
+               <li>
+                  <a [routerLink]="['/login']" (click)="logOut()"><span>&nbsp;Cerrar Sesión</span></a>
+               </li>
+            </ul>
+         </li>
+      </div>
+   </div>
+</nav>
