@@ -29,6 +29,11 @@ export class InstitutionProfileComponent implements OnInit {
     this.getMyInstitution();
   }
 
+  address_mapEvent(event) {
+    this.institutionSelected.address_map_latitude = event.coords.lat;
+    this.institutionSelected.address_map_longitude = event.coords.lng;
+  }
+
   getMyInstitution() {
     this.documentSharingDataService.myInstitution().then( r => {
       this.institutionSelected = r.institution as Institution;
