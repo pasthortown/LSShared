@@ -13,6 +13,7 @@ import { PublicationType } from './../../models/PublicationType';
 import { PublicationTypeService } from './../../services/CRUD/publicationtype.service';
 import { PublicationService } from './../../services/CRUD/publication.service';
 import { AuthorService } from './../../services/CRUD/author.service';
+import { PublicationAttachmentService } from './../../services/CRUD/publicationattachment.service';
 
 @Component({
   selector: 'app-my-publications',
@@ -34,6 +35,8 @@ export class MyPublicationsComponent implements OnInit {
   authors_publicationSelectedId: number;
   publication_types: PublicationType[] = [];
   institution_internal_divitions: InstitutionInternalDivition[] = [];
+  newAuthorToAdd: Author = new Author();
+  addingAuthor = false;
 
   constructor(private documentSharingDataService: DocumentSharingService,
     private toastr: ToastrManager,
@@ -41,6 +44,7 @@ export class MyPublicationsComponent implements OnInit {
     private authorDataService: AuthorService,
     private publication_typeDataService: PublicationTypeService,
     private publicationDataService: PublicationService,
+    private publication_attachmentDataService: PublicationAttachmentService,
     private publication_commentDataService: PublicationCommentService) {}
 
   ngOnInit() {
@@ -48,10 +52,67 @@ export class MyPublicationsComponent implements OnInit {
   }
 
   refresh() {
+    this.newAuthorToAdd = new Author();
+    this.newAuthorToAdd.id = 0;
+    this.addingAuthor = false;
     this.getInstitutionPublications();
     this.getAuthor();
     this.getPublicationType();
     this.getMyInstitution();
+  }
+
+  newAuthor() {
+    this.addingAuthor = true;
+    this.authors_publicationSelectedId = 0;
+  }
+
+  addAuthor() {
+    if (this.authors_publicationSelectedId === 0) {
+      this.toastr.errorToastr('Seleccione un registro.', 'Error');
+      return;
+    }
+    this.authors.forEach(author => {
+      if (author.id == this.authors_publicationSelectedId) {
+         let existe = false;
+         this.publicationToBuild.authors_on_publication.forEach(element => {
+            if (element.id == author.id) {
+               existe = true;
+            }
+         });
+         if (!existe) {
+            this.publicationToBuild.authors_on_publication.push(author);
+            this.authors_publicationSelectedId = 0;
+         } else {
+            this.toastr.errorToastr('El registro ya existe.', 'Error');
+         }
+      }
+    });
+  }
+
+  removeAuthor() {
+    if (this.authors_publicationSelectedId === 0) {
+      this.toastr.errorToastr('Seleccione un registro.', 'Error');
+      return;
+    }
+    const newAuthors: Author[] = [];
+    let eliminado = false;
+    this.publicationToBuild.authors_on_publication.forEach(author => {
+      if (author.id !== this.authors_publicationSelectedId) {
+         newAuthors.push(author);
+      } else {
+         eliminado = true;
+      }
+    });
+    if (!eliminado) {
+      this.toastr.errorToastr('Registro no encontrado.', 'Error');
+      return;
+    }
+    this.publicationToBuild.authors_on_publication = newAuthors;
+    this.authors_publicationSelectedId = 0;
+  }
+
+  selectAuthor(author: Author) {
+    this.authors_publicationSelectedId = author.id;
   }
 
   getMyInstitution() {
@@ -81,21 +142,20 @@ export class MyPublicationsComponent implements OnInit {
     this.documentSharingDataService.getInstitutionPublications(this.searchValue).then( r => {
       this.publicationsToShow = r;
       this.getInstitutionInternalDivitions();
+      if (this.selectedInternalInstitucionDivitionId != 0) {
+        const newListToShow = [];
+        this.publicationsToShow.forEach(element => {
+          if (element.institution_internal_divition.id == this.selectedInternalInstitucionDivitionId){
+            newListToShow.push(element);
+          }
+        });
+        this.publicationsToShow = newListToShow;
+      }
     }).catch( e => {console.log(e);} );
   }
 
   filterChangeInternalInstitucionDivition() {
-    if (this.selectedInternalInstitucionDivitionId == 0) {
-      this.getInstitutionPublications();
-    } else {
-      const newListToShow = [];
-      this.publicationsToShow.forEach(element => {
-        if (element.institution_internal_divition.id == this.selectedInternalInstitucionDivitionId){
-          newListToShow.push(element);
-        }
-      });
-      this.publicationsToShow = newListToShow;
-    }
+    this.getInstitutionPublications();
   }
 
   searchPublications() {
@@ -139,8 +199,15 @@ export class MyPublicationsComponent implements OnInit {
         console.log(e);
     });
   }
+  
+  downloadPublicationToBuildFile() {
+    this.downloadFile(
+      this.publicationToBuildAttachment.publication_attachment_file,
+      this.publicationToBuildAttachment.publication_attachment_file_type,
+      this.publicationToBuildAttachment.publication_attachment_file_name);
+  }
 
-  downloadFile(file: string, type: string, name: string) {
+  downloadFile(file: any, type: any, name: any) {
     const byteCharacters = atob(file);
     const byteNumbers = new Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {
@@ -149,6 +216,21 @@ export class MyPublicationsComponent implements OnInit {
     const byteArray = new Uint8Array(byteNumbers);
     const blob = new Blob([byteArray], { type: type });
     saveAs(blob, name);
+  }
+
+  saveNewAuthor() {
+    this.authorDataService.post(this.newAuthorToAdd).then( r => {
+      this.toastr.successToastr('Autor guardado satisfactoriamente.', 'Nuevo');
+      this.getAuthor();
+      this.publicationToBuild.authors_on_publication.push(r);
+      this.newAuthorToAdd = new Author();
+      this.addingAuthor = false;
+    }).catch( e => console.log(e) );
+  }
+
+  cancelAddingAuthor() {
+    this.newAuthorToAdd = new Author();
+    this.addingAuthor = false;
   }
 
   sendNewComment() {
@@ -171,11 +253,13 @@ export class MyPublicationsComponent implements OnInit {
     this.authors_publicationSelectedId = 0;
     this.publicationToBuild.publication_type_id = 0;
     this.publicationToBuild.institution_internal_divition_id = 0;
+    this.addingAuthor = false;
     this.openDialog(content);
   }
 
   editPublication(content) {
     this.hasSelected = false;
+    this.addingAuthor = false;
     if ( typeof this.publicationToBuild.authors_on_publication === 'undefined' ) {
        this.publicationToBuild.authors_on_publication = [];
     }
@@ -184,8 +268,17 @@ export class MyPublicationsComponent implements OnInit {
        return;
     }
     this.getAuthorsOnPublication();
+    this.getAttachedFileOfPublication(this.publicationToBuild.id);
     this.authors_publicationSelectedId = 0;
     this.openDialog(content);
+  }
+
+  getAttachedFileOfPublication(id: number) {
+    this.documentSharingDataService.getPublicationAttachmentByPublicationId(id).then( r => {
+      this.publicationToBuildAttachment = r;
+    }).catch( e => {
+        console.log(e);
+    });
   }
 
   getAuthorsOnPublication() {
@@ -211,12 +304,50 @@ export class MyPublicationsComponent implements OnInit {
   openDialog(content) {
     this.modalService.open(content, { centered: true , size: 'lg' }).result.then(( response => {
        if ( response === 'Guardar click' ) {
-          if (typeof this.publicationSelected.id === 'undefined') {
-            alert(1);
-          } else {
-            alert(2);
-          }
+        if (typeof this.publicationToBuild.id === 'undefined') {
+          this.publicationDataService.post(this.publicationToBuild).then( r => {
+            this.publicationToBuildAttachment.publication_id = r.id;
+            this.documentSharingDataService.getPublicationAttachmentByPublicationId(r.id).then( r1 => {
+              if (typeof r1.id === 'undefined') {
+                this.publication_attachmentDataService.post(this.publicationToBuildAttachment).then( r => {
+                  this.toastr.successToastr('Datos guardados satisfactoriamente.', 'Nuevo');
+                  this.refresh();
+                }).catch( e => console.log(e) );
+              } else {
+                this.publicationToBuildAttachment.id = r1.id;
+                this.publication_attachmentDataService.put(this.publicationToBuildAttachment).then( r => {
+                  this.toastr.successToastr('Registro actualizado satisfactoriamente.', 'Actualizar');
+                  this.refresh();
+                }).catch( e => console.log(e) );
+              }
+            }).catch( e1 => {
+              console.log(e1);
+            });
+          }).catch( e => console.log(e) );
+        } else {
+          this.publicationDataService.put(this.publicationToBuild).then( r => {
+            this.publicationToBuildAttachment.publication_id = r.id;
+            this.documentSharingDataService.getPublicationAttachmentByPublicationId(r.id).then( r1 => {
+              if (typeof r1.id === 'undefined') {
+                this.publication_attachmentDataService.post(this.publicationToBuildAttachment).then( r => {
+                  this.toastr.successToastr('Datos guardados satisfactoriamente.', 'Nuevo');
+                  this.refresh();
+                }).catch( e => console.log(e) );
+              } else {
+                this.publicationToBuildAttachment.id = r1.id;
+                this.publication_attachmentDataService.put(this.publicationToBuildAttachment).then( r => {
+                  this.toastr.successToastr('Registro actualizado satisfactoriamente.', 'Actualizar');
+                  this.refresh();
+                }).catch( e => console.log(e) );
+              }
+            }).catch( e => console.log(e) );
+          }).catch( e => console.log(e) );
+        }
+       } else {
+         this.refresh();
        }
-    }), ( r => {}));
- }
+      }), ( r => {
+        this.refresh();
+      }));
+    }
 }

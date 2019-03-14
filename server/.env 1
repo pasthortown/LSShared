@@ -2,7 +2,7 @@ APP_NAME="Document Sharing"
 APP_ENV=local
 APP_KEY=FAqpOlyCQGuJVlXdgqCdxpsFQ8fgfMuI
 APP_DEBUG=true
-APP_URL=http://localhost:8000
+APP_URL=http://192.168.20.51:8000
 APP_TIMEZONE=UTC
 
 LOG_CHANNEL=stack

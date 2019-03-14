@@ -253,37 +253,7 @@
               </div>
            </div>
            <div class="form-group row">
-              <label class="col-12 col-form-label mb-2"><strong>Autores</strong></label>
-              <label class="col-4 col-form-label">Autor</label>
-              <div class="col-8">
-                 <div class="input-group">
-                    <div class="input-group-prepend">
-                       <button type="button" title="Eliminar" class="btn btn-danger" (click)="removeAuthor()"><i class="fas fa-trash"></i></button>
-                       <button type="button" title="Agregar" class="btn btn-success" (click)="addAuthor()"><i class="fas fa-plus-circle"></i></button>
-                    </div>
-                    <select class="form-control" id="author_id" name="author_id" [(ngModel)]="authors_publicationSelectedId">
-                       <option value="0" selected>Seleccione...</option>
-                       <option *ngFor="let author of authors" value={{author.id}}>
-                          {{author.name}} {{author.last_name}}
-                       </option>
-                    </select>
-                 </div>
-              </div>
-              <div class="col-4">
-              </div>
-              <div class="col-8">
-                 <table class="table table-hover mt-2">
-                    <tbody>
-                       <tr *ngFor="let author of publicationToBuild.authors_on_publication" (click)="selectAuthor(author)">
-                          <td class="text-right"><span *ngIf="authors_publicationSelectedId === author.id" class="far fa-hand-point-right"></span></td>
-                          <td>{{author.name}} {{author.last_name}}</td>
-                       </tr>
-                    </tbody>
-                 </table>
-              </div>
-           </div>
-           <div class="form-group row">
-              <label for="publication_type_id" class="col-4 col-form-label">Tipo de Publicación</label>
+            <label for="publication_type_id" class="col-4 col-form-label">Tipo de Publicación</label>
               <div class="col-8">
                  <select class="form-control" id="publication_type_id" name="publication_type_id" [(ngModel)]="publicationToBuild.publication_type_id">
                     <option value="0" selected>Seleccione...</option>
@@ -305,6 +275,77 @@
               </div>
            </div>
            <div class="form-group row">
+              <label class="col-12 col-form-label mb-2"><strong>Autores</strong></label>
+              <label class="col-4 col-form-label">Autor</label>
+              <div class="col-8">
+                 <div class="input-group">
+                    <div class="input-group-prepend">
+                       <button type="button" title="Quitar" class="btn btn-warning" (click)="removeAuthor()"><i class="fas fa-trash"></i></button>
+                       <button type="button" title="Agregar" class="btn btn-success" (click)="addAuthor()"><i class="fas fa-plus-circle"></i></button>
+                       <button type="button" title="Nuevo" class="btn btn-primary" (click)="newAuthor()"><i class="fas fa-file"></i></button>
+                    </div>
+                    <select class="form-control" id="author_id" name="author_id" [(ngModel)]="authors_publicationSelectedId">
+                       <option value="0" selected>Seleccione...</option>
+                       <option *ngFor="let author of authors" value={{author.id}}>
+                          {{author.name}} {{author.last_name}}
+                       </option>
+                    </select>
+                 </div>
+              </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-4">
+                </div>
+                <div class="col-8">
+                   <table class="table table-hover mt-2">
+                      <tbody>
+                         <tr *ngFor="let author of publicationToBuild.authors_on_publication" (click)="selectAuthor(author)">
+                            <td class="text-right"><span *ngIf="authors_publicationSelectedId === author.id" class="far fa-hand-point-right"></span></td>
+                            <td>{{author.name}} {{author.last_name}}</td>
+                         </tr>
+                      </tbody>
+                   </table>
+                </div>
+             </div>
+            <div class="form-group row" *ngIf="addingAuthor">
+              <strong class="col-12 col-form-label">Autor Nuevo</strong>
+              <div class="col-12">
+                
+                  <div class="form-group row">
+                      <label for="name" class="col-4 col-form-label">Nombres</label>
+                      <div class="col-8">
+                         <input type="text" class="form-control" id="name" name="name" placeholder="Nombres" [(ngModel)]="newAuthorToAdd.name">
+                      </div>
+                   </div>
+                   <div class="form-group row">
+                      <label for="last_name" class="col-4 col-form-label">Apellidos</label>
+                      <div class="col-8">
+                         <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Apellidos" [(ngModel)]="newAuthorToAdd.last_name">
+                      </div>
+                   </div>
+                   <div class="form-group row">
+                      <label for="affiliation" class="col-4 col-form-label">Departamento</label>
+                      <div class="col-8">
+                         <input type="text" class="form-control" id="affiliation" name="affiliation" placeholder="Departamento" [(ngModel)]="newAuthorToAdd.affiliation">
+                      </div>
+                   </div>
+                   <div class="form-group row">
+                      <label for="email" class="col-4 col-form-label">Correo Electrónico</label>
+                      <div class="col-8">
+                         <input type="text" class="form-control" id="email" name="email" placeholder="Correo Electrónico" [(ngModel)]="newAuthorToAdd.email">
+                      </div>
+                   </div>
+                   <div class="form-group row">
+                      <div class="col-12 text-center">
+                          <button type="button" class="btn btn-outline-success" (click)="saveNewAuthor()">Guardar</button>
+                          <button type="button" class="btn btn-outline-danger" (click)="cancelAddingAuthor()">Cancelar</button>
+                      </div>
+                   </div>
+              </div>
+            </div>
+            
+           <div class="form-group row">
+            <label class="col-12 col-form-label mb-2"><strong>Archivo Adjunto</strong></label>
             <label for="publication_attachment_file_type" class="col-4 col-form-label">Tipo de Archivo</label>
             <div class="col-8">
                <input type="text" class="form-control" id="publication_attachment_file_type" name="publication_attachment_file_type" placeholder="Tipo de Archivo" [(ngModel)]="publicationToBuildAttachment.publication_attachment_file_type">
@@ -313,13 +354,31 @@
          <div class="form-group row">
             <label for="publication_attachment_file_name" class="col-4 col-form-label">Nombre del Archivo</label>
             <div class="col-8">
-               <input type="text" class="form-control" id="publication_attachment_file_name" name="publication_attachment_file_name" placeholder="Nombre del Archivo" [(ngModel)]="publicationToBuildAttachment.publication_attachment_file_name">
+               
+
+               <div class="input-group">
+                  <div class="input-group-prepend">
+                     <button type="button" title="Nuevo" class="btn btn-success" (click)="attachmentFile.click()">
+                       <i class="fas fa-upload"></i>
+                      </button>
+                     <button
+                        type="button"
+                        title="Descargar"
+                        class="btn btn-success"
+                        (click)="downloadPublicationToBuildFile()"
+                      >
+                        <i class="fas fa-download"></i>
+                      </button>  
+                  </div>
+                  <input type="text" class="form-control" id="publication_attachment_file_name" name="publication_attachment_file_name" placeholder="Nombre del Archivo" [(ngModel)]="publicationToBuildAttachment.publication_attachment_file_name">
+               </div>
+
             </div>
          </div>
-         <div class="form-group row">
+         <div class="form-group row" [hidden]="true">
             <label for="publication_attachment_file" class="col-4 col-form-label">Adjunto</label>
             <div class="col-8">
-               <input type="file" class="form-control" id="publication_attachment_file" name="publication_attachment_file" placeholder="Adjunto" (change)="CodeFilePublicationAttachment($event)">
+               <input #attachmentFile type="file" class="form-control" id="publication_attachment_file" name="publication_attachment_file" placeholder="Adjunto" (change)="CodeFilePublicationAttachment($event)">
             </div>
          </div>
         </div>

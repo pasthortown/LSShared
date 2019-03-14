@@ -10,6 +10,7 @@ import { CKEditorModule } from 'ngx-ckeditor';
 import { PublicationTypeService } from './../../services/CRUD/publicationtype.service';
 import { PublicationService } from './../../services/CRUD/publication.service';
 import { AuthorService } from './../../services/CRUD/author.service';
+import { PublicationAttachmentService } from './../../services/CRUD/publicationattachment.service';
 
 @NgModule({
   imports: [CommonModule, CKEditorModule, MyPublicationsRoutingModule],
@@ -19,6 +20,7 @@ import { AuthorService } from './../../services/CRUD/author.service';
     PublicationCommentService,
     PublicationTypeService,
     PublicationService,
+    PublicationAttachmentService,
     AuthorService
   ]
 })
