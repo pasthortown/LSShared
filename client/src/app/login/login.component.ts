@@ -16,7 +16,9 @@ export class LoginComponent implements OnInit {
   email: String = '';
   busy: Promise<any>;
   esperando: boolean;
-
+  activate: boolean;
+  max_wait = 2;
+  count_wait = 1;
   constructor(private router: Router, private authDataServise: AuthService, private profilePictureDataService: ProfilePictureService) {}
 
   ngOnInit() {
@@ -29,13 +31,13 @@ export class LoginComponent implements OnInit {
     if ( !this.esperando ) {
       this.esperando = true;
       this.busy = this.authDataServise.login(this.email, this.password).then( r => {
-        this.esperando = false;
         sessionStorage.setItem('api_token', r.token);
         sessionStorage.setItem('isLoggedin', 'true');
         sessionStorage.setItem('rols', JSON.stringify(r.rol));
         const userData = { id: r.id, name: r.name };
         sessionStorage.setItem('user', JSON.stringify(userData));
-        this.router.navigate(['/main']);
+        this.activate = true;
+        this.wait();
       }).catch( e => {
         this.esperando = false;
         swal({
@@ -50,6 +52,19 @@ export class LoginComponent implements OnInit {
       });
     }
   }
+
+  wait() {
+    if (this.activate && this.count_wait <= this.max_wait) {
+      setTimeout(() => {
+        this.count_wait ++;
+        this.wait();
+      }, 1000);
+    } else {
+      this.esperando = false;
+      this.router.navigate(['/main']);
+    }
+  }
+
 
   password_recovery() {
     if ( !this.esperando ) {
